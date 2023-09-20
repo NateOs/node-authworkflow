@@ -2,6 +2,7 @@ const User = require("../models/User");
 const { StatusCodes } = require("http-status-codes");
 const CustomError = require("../errors");
 const { attachCookiesToResponse, createTokenUser } = require("../utils");
+const crypto = require("crypto");
 
 const register = async (req, res) => {
   const { email, name, password } = req.body;
@@ -15,7 +16,8 @@ const register = async (req, res) => {
   const isFirstAccount = (await User.countDocuments({})) === 0;
   const role = isFirstAccount ? "admin" : "user";
 
-  const verificationToken = "fake token";
+  const verificationToken = crypto.randomBytes(40).toString("hex");
+
   const user = await User.create({
     name,
     email,
@@ -24,12 +26,10 @@ const register = async (req, res) => {
     verificationToken,
   });
 
-  res
-    .status(StatusCodes.CREATED)
-    .json({
-      msg: "user created successfully, check email to verify account",
-      verificationToken: user.verificationToken,
-    });
+  res.status(StatusCodes.CREATED).json({
+    msg: "user created successfully, check email to verify account",
+    verificationToken: user.verificationToken,
+  });
 };
 
 const login = async (req, res) => {
@@ -47,11 +47,19 @@ const login = async (req, res) => {
   if (!isPasswordCorrect) {
     throw new CustomError.UnauthenticatedError("Invalid Credentials");
   }
+
+  const isUserVerified = user.isVerified;
+
+  if (!isUserVerified) {
+    throw new CustomError.UnauthenticatedError("User email is not verified");
+  }
+
   const tokenUser = createTokenUser(user);
   attachCookiesToResponse({ res, user: tokenUser });
 
   res.status(StatusCodes.OK).json({ user: tokenUser });
 };
+
 const logout = async (req, res) => {
   res.cookie("token", "logout", {
     httpOnly: true,
@@ -60,8 +68,17 @@ const logout = async (req, res) => {
   res.status(StatusCodes.OK).json({ msg: "user logged out!" });
 };
 
+const verifyEmail = async (req, res) => {
+  const { verificationToken, email } = req.body;
+
+  res
+    .status(StatusCodes.OK)
+    .json({ verificationToken: verificationToken, email: email });
+};
+
 module.exports = {
   register,
   login,
   logout,
+  verifyEmail
 };
