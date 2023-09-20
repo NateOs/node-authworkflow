@@ -71,14 +71,31 @@ const logout = async (req, res) => {
 const verifyEmail = async (req, res) => {
   const { verificationToken, email } = req.body;
 
-  res
-    .status(StatusCodes.OK)
-    .json({ verificationToken: verificationToken, email: email });
+  const user = await User.findOne({ email: email });
+
+  if (!user) {
+    throw new CustomError.NotFoundError("Verification failed");
+  }
+
+  if (user.verificationToken !== verificationToken) {
+    throw new CustomError.UnauthenticatedError("Verification failed");
+  }
+
+  user.isVerified = true;
+  user.verificationToken = "";
+  user.verified = Date.now();
+
+  await user.save();
+
+  res.status(StatusCodes.OK).json({
+    email: email,
+    msg: "your email has been verified, thanks",
+  });
 };
 
 module.exports = {
   register,
   login,
   logout,
-  verifyEmail
+  verifyEmail,
 };
