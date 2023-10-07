@@ -3,6 +3,7 @@ const { StatusCodes } = require("http-status-codes");
 const CustomError = require("../errors");
 const { attachCookiesToResponse, createTokenUser } = require("../utils");
 const crypto = require("crypto");
+const nodemailer = require("nodemailer");
 
 const register = async (req, res) => {
   const { email, name, password } = req.body;
@@ -25,6 +26,26 @@ const register = async (req, res) => {
     role,
     verificationToken,
   });
+
+  // send email verification
+
+  const transporter = nodemailer.createTransport({
+    host: "smtp.ethereal.email",
+    port: 587,
+    auth: {
+      user: "melissa.flatley14@ethereal.email",
+      pass: "sd65SrR9V2R962EYtF",
+    },
+  });
+
+  let info = await transporter.sendMail({
+    from: 'fred foo <foo@example.com>',
+    to: "bar@example.com",
+    subject: "Verification",
+    html: <h1>Hello Verify?</h1>
+  });
+
+  console.log(info);
 
   res.status(StatusCodes.CREATED).json({
     msg: "user created successfully, check email to verify account",
