@@ -31,7 +31,9 @@ const register = async (req, res) => {
     verificationToken,
   });
 
-  sendVerificationEmail({ name, email, verificationToken });
+  const origin = "http://localhost:3000";
+  
+  sendVerificationEmail({ name, email, verificationToken, origin });
 
   res.status(StatusCodes.CREATED).json({
     msg: "user created successfully, check email to verify account",
@@ -40,6 +42,7 @@ const register = async (req, res) => {
 
   console.log(verificationToken);
 };
+
 const login = async (req, res) => {
   const { email, password } = req.body;
 
