@@ -9,6 +9,7 @@ const {
 } = require("../utils");
 const crypto = require("crypto");
 
+let user={};
 const register = async (req, res) => {
   const { email, name, password } = req.body;
 
@@ -50,7 +51,8 @@ const login = async (req, res) => {
   if (!email || !password) {
     throw new CustomError.BadRequestError("Please provide email and password");
   }
-  const user = await User.findOne({ email });
+   user = await User.findOne({ email });
+  console.log(user);
 
   if (!user) {
     throw new CustomError.UnauthenticatedError("Invalid Credentials");
@@ -98,7 +100,9 @@ const login = async (req, res) => {
 };
 
 const logout = async (req, res) => {
-  await Token.findOneAndDelete({ user: req.user.userId });
+  console.log(user)
+  console.log(req.user)
+  await Token.findOneAndDelete({ user: user.userId });
   res.cookie("accessToken", "logout", {
     httpOnly: true,
     expires: new Date(Date.now()),
