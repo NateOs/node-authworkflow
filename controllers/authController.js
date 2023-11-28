@@ -192,6 +192,7 @@ const resetPassword = async (req, res) => {
       await user.save();
     }
   }
+  res.status(StatusCodes.OK).json({ msg: "Try logging again" });
 };
 
 module.exports = {
