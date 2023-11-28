@@ -6,8 +6,10 @@ const {
   attachCookiesToResponse,
   createTokenUser,
   sendVerificationEmail,
+  sendPasswordResetEmail,
 } = require("../utils");
 const crypto = require("crypto");
+const { log } = require("console");
 
 let user = {};
 const register = async (req, res) => {
@@ -141,6 +143,7 @@ const verifyEmail = async (req, res) => {
 
 const forgotPassword = async (req, res) => {
   const { email } = req.body;
+  const origin = "http://localhost:3000";
 
   if (!email) {
     throw new CustomError.BadRequestError("Invalid email address");
@@ -150,7 +153,14 @@ const forgotPassword = async (req, res) => {
 
   if (user) {
     const passwordToken = crypto.randomBytes(70).toString("hex");
-    // send email
+
+    sendPasswordResetEmail({
+      name: user.name,
+      email: user.email,
+      origin,
+      token: passwordToken,
+    });
+
     const tenMinutes = 1000 * 60 * 10;
     const passwordTokenExpirationDate = new Date(Date.now() + tenMinutes);
 
@@ -163,7 +173,25 @@ const forgotPassword = async (req, res) => {
 };
 
 const resetPassword = async (req, res) => {
-  res.send("reset password");
+  const { email, token, password } = req.body;
+  if (!email || !token || !password) {
+    throw new CustomError.BadRequestError("Please provide all required fields");
+  }
+
+  const user = await User.findOne({ email: email });
+
+  if (user) {
+    const currentDate = new Date();
+    if (
+      user.passwordToken === token &&
+      user.passwordTokenExpirationDate > currentDate
+    ) {
+      user.password = password;
+      user.passwordToken = null;
+      user.passwordTokenExpirationDate = null;
+      await user.save();
+    }
+  }
 };
 
 module.exports = {
