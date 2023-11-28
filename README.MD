@@ -22,41 +22,41 @@
 
 #### Verify Email Controller
 
-- [] create verifyEmail in authController
-- [] get verificationToken and email from req.body
-- [] setup a '/verify-email' route in authRoutes
-- [] test in a Postman
-- [] check for user using email
-- [] if no user 401
-- [] if token does not match user token 401
-- [] if correct set
-- [] user.isVerified = true
-- [] user.verified = Date.now()
-- [] user.verificationToken = ''
-- [] save use with instance method
-- [] return msg:'email verified'
+- [x] create verifyEmail in authController
+- [x] get verificationToken and email from req.body
+- [x] setup a '/verify-email' route in authRoutes
+- [x] test in a Postman
+- [x] check for user using email
+- [x] if no user 401
+- [x] if token does not match user token 401
+- [x] if correct set
+- [x] user.isVerified = true
+- [x] user.verified = Date.now()
+- [x] user.verificationToken = ''
+- [x] save use with instance method
+- [x] return msg:'email verified'
 
 #### Email Setup
 
-- [] re-watch project 08
-- [] ethereal credentials (create account/login)
-- [] install nodemailer
-- [] create (nodemailerConfig, sendEmail,
+- [x] re-watch project 08
+- [x] ethereal credentials (create account/login)
+- [x] install nodemailer
+- [x] create (nodemailerConfig, sendEmail,
   sendResetPasswordEmail, sendVerficationEmail) files in utils
 
 #### Send Verification Link
 
-- [] refactor sendEmail
-- [] setup sendVerificationEmail.js
-- [] pass arguments
+- [x] refactor sendEmail
+- [x] setup sendVerificationEmail.js
+- [x] pass arguments
 
 #### Token Model
 
-- [] create Token.js in models
-- [] refreshToken,ip,userAgent - all String and required
-- [] isValid - Boolean, default:true
-- [] ref user
-- [] timestamps true
+- [x] create Token.js in models
+- [x] refreshToken,ip,userAgent - all String and required
+- [x] isValid - Boolean, default:true
+- [x] ref user
+- [x] timestamps true
 
 #### Setup Token in Login Controller
 
